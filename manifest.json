@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "JobPin — Employer Jobs from HiringCafe & Jobright",
+  "version": "3.0.0",
+  "description": "Pinned side panel that collects HiringCafe and Jobright jobs whose Apply button goes to the hiring company's own career page or ATS (not LinkedIn, not job boards).",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "unlimitedStorage", "tabs", "scripting", "sidePanel"],
+  "host_permissions": ["https://jobright.ai/*", "https://hiringcafe.com/*", "https://hiring.cafe/*"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_title": "Open JobPin"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://jobright.ai/*"],
+      "js": ["content/hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://jobright.ai/*"],
+      "js": ["content/jobright.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JobPin — Inbox</title>
+    <link rel="stylesheet" href="ui.css" />
+    <link rel="stylesheet" href="board.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============ top bar ============ -->
+      <header class="appbar">
+        <div class="brand">
+          <div class="brand-mark">J</div>
+          <div class="brand-text">
+            <h1>JobPin</h1>
+            <div class="sub" id="subtitle">Employer-direct jobs from HiringCafe and Jobright</div>
+          </div>
+        </div>
+
+        <!-- the two lists -->
+        <nav class="views" role="tablist" aria-label="Lists">
+          <button id="tabInbox" class="view-tab" type="button" role="tab" aria-selected="true" aria-controls="split">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v6H4v-6z"/></svg>
+            Inbox <span id="countInbox" class="count">0</span>
+          </button>
+          <button id="tabApplied" class="view-tab" type="button" role="tab" aria-selected="false" aria-controls="split">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.8 2.8L16.2 9.6"/></svg>
+            Applied <span id="countApplied" class="count">0</span>
+          </button>
+        </nav>
+
+        <div class="appbar-actions">
+          <span id="runPill" class="pill idle"><span class="dot"></span><span id="runText">Idle</span></span>
+          <button id="btnCsv" class="btn" title="Download the jobs listed below as a CSV file">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>
+            <span class="label">Export CSV</span>
+          </button>
+          <button id="btnFilters" class="btn" aria-haspopup="dialog">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+            <span class="label">Filters</span> <span id="filterBadge" class="badge" hidden>0</span>
+          </button>
+          <button id="btnRun" class="btn primary">Start scraping</button>
+        </div>
+      </header>
+
+      <!-- per-board run status / problems -->
+      <div id="runNote" class="runnote" hidden></div>
+
+      <!-- "Did you apply?" — for apply links opened from here and not yet answered -->
+      <div id="pending" class="pending" role="region" aria-label="Confirm applications" hidden></div>
+
+      <!-- Applied view: how much has gone out -->
+      <section id="appliedStats" class="stat-strip" aria-label="Application summary" hidden></section>
+
+      <!-- ============ controls ============ -->
+      <div class="controls">
+        <label class="field grow">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="q" type="search" placeholder="Search title or company — separate words with commas" autocomplete="off" aria-label="Search" />
+        </label>
+        <label id="excludeField" class="field grow">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+          <input id="exclude" type="search" placeholder="Hide titles starting with — e.g. sales, marketing" autocomplete="off" aria-label="Hide titles starting with" />
+        </label>
+
+        <div id="sourceSeg" class="segmented" role="group" aria-label="Job board"></div>
+
+        <div id="atsPicker" class="ats-picker">
+          <button id="atsBtn" class="select-btn" type="button" aria-haspopup="listbox" aria-expanded="false">All ATS</button>
+          <div id="atsMenu" class="popover" hidden>
+            <input id="atsSearch" type="search" placeholder="Find an ATS" autocomplete="off" aria-label="Find an ATS" />
+            <div id="atsOptions" class="ats-options" role="listbox" aria-multiselectable="true"></div>
+            <div class="popover-foot">
+              <button id="atsClear" class="link-btn" type="button">All ATS</button>
+              <button id="atsDone" class="btn sm primary" type="button">Done</button>
+            </div>
+          </div>
+        </div>
+
+        <select id="sort" aria-label="Sort"></select>
+
+        <label id="ignoreField" class="inline-switch" title="Ignore the Filters panel and list every employer job collected">
+          <span class="switch"><input id="ignoreFilters" type="checkbox" /><span></span></span>
+          Ignore filters
+        </label>
+      </div>
+
+      <div id="activeFilters" class="active-filters" title="Click to edit filters" role="button" tabindex="0"></div>
+
+      <!-- ============ list + detail ============ -->
+      <main id="split" class="split">
+        <section class="list-pane" aria-label="Jobs">
+          <div class="list-head">
+            <span id="listSummary">—</span>
+            <span id="listMeta" class="hint"></span>
+          </div>
+          <div id="rows" class="rows" role="listbox" aria-label="Jobs"></div>
+          <div id="empty" class="empty-host" hidden></div>
+          <div id="shortcuts" class="shortcuts" aria-hidden="true"></div>
+          <div id="pager" class="pager" hidden>
+            <button id="pagePrev" class="btn sm">← Prev</button>
+            <span id="pageLabel"></span>
+            <button id="pageNext" class="btn sm">Next →</button>
+          </div>
+        </section>
+
+        <section id="detail" class="detail-pane" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <!-- ============ filters drawer ============ -->
+    <div id="drawer" class="drawer" hidden>
+      <div id="drawerScrim" class="drawer-scrim"></div>
+      <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+        <header class="drawer-head">
+          <div>
+            <h2 id="drawerTitle">Filters</h2>
+            <div class="hint">Narrow the jobs below, and what the next run fetches.</div>
+          </div>
+          <button id="drawerClose" class="icon-btn" title="Close" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </header>
+        <div id="drawerForm" class="drawer-body settings"></div>
+        <footer class="drawer-foot">
+          <button id="drawerReset" class="btn ghost">Reset</button>
+          <span class="spacer"></span>
+          <button id="drawerCancel" class="btn">Cancel</button>
+          <button id="drawerSave" class="btn primary">Save &amp; apply</button>
+        </footer>
+      </aside>
+    </div>
+
+    <script type="module" src="board.js"></script>
+  </body>
+</html>

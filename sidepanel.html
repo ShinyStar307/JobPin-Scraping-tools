@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JobPin</title>
+    <link rel="stylesheet" href="ui.css" />
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <!-- ================= MAIN VIEW ================= -->
+    <div id="viewMain" class="view">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">J</div>
+          <div>
+            <div class="brand-name">JobPin</div>
+            <div class="brand-sub">Employer-direct jobs · HiringCafe &amp; Jobright</div>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="btnFull" class="icon-btn" title="Open the full inbox in a new tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+          <button id="btnSettings" class="icon-btn" title="Settings &amp; filters">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="card status-card">
+          <div class="status-row">
+            <span id="statePill" class="pill idle"><span class="dot"></span><span id="stateText">Idle</span></span>
+            <span id="startedAt" class="hint"></span>
+          </div>
+
+          <div class="boards-pick">
+            <div class="caps">Job boards</div>
+            <div id="boards" class="seg"></div>
+          </div>
+
+          <p id="statusMsg" class="status-msg">Choose your job boards, then press Start.</p>
+          <div id="srcStatus" class="src-status"></div>
+          <p id="statusErr" class="status-err" hidden></p>
+          <button id="btnToggle" class="btn primary block">Start scraping</button>
+        </section>
+
+        <!-- "Did you apply?" — for apply links opened from here and not yet answered -->
+        <section id="pending" class="pending" role="region" aria-label="Confirm applications" hidden></section>
+
+        <section class="stats">
+          <div class="stat card" title="Collected jobs that pass your filters"><div class="stat-num" id="stMatched">0</div><div class="stat-label">Matched</div></div>
+          <button id="stAppliedBtn" class="stat card applied" type="button" title="Jobs you have applied to — open the list">
+            <div class="stat-num" id="stApplied">0</div><div class="stat-label">Applied</div>
+          </button>
+          <div class="stat card" title="Employer jobs waiting in the inbox"><div class="stat-num" id="stEmployer">0</div><div class="stat-label">Collected</div></div>
+          <div id="stSkippedBox" class="stat card"><div class="stat-num" id="stSkipped">0</div><div class="stat-label">Skipped</div></div>
+        </section>
+
+        <section id="filterSummary" class="filter-summary" title="Click to edit filters"></section>
+
+        <div class="list-head">
+          <div id="listTabs" class="tabs" role="tablist" aria-label="Lists">
+            <button id="tabMatched" class="tab on" type="button" role="tab" aria-selected="true">Matched <span id="tcMatched" class="tc">0</span></button>
+            <button id="tabApplied" class="tab" type="button" role="tab" aria-selected="false">Applied <span id="tcApplied" class="tc">0</span></button>
+          </div>
+          <button id="btnFull2" class="link-btn">Open inbox →</button>
+        </div>
+        <div id="list" class="job-list"></div>
+
+        <div class="footer-actions">
+          <button id="btnClear" class="btn ghost danger sm">Clear list</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SETTINGS VIEW ================= -->
+    <div id="viewSettings" class="view" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <button id="btnBack" class="icon-btn" title="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div>
+            <div class="brand-name">Settings</div>
+            <div class="brand-sub">Filters apply to collected jobs instantly</div>
+          </div>
+        </div>
+      </header>
+
+      <div id="settingsForm" class="content settings"></div>
+
+      <footer class="settings-footer">
+        <button id="btnReset" class="btn ghost">Reset</button>
+        <button id="btnSave" class="btn primary">Save settings</button>
+      </footer>
+    </div>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
